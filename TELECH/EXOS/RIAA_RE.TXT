@@ -1,0 +1,75 @@
+include ":incl:system"
+include ":incl:basic"
+
+-- Correcteur RIAA Yves Caroff
+-- D. Chevallier
+-- 14/03/2001
+
+-- Vecteur fréquence : étude de 20Hz à 20kHz
+f=logspace(1,100000,50)
+
+
+-- Composants
+-- Contre réaction
+R1:=47K:
+R2:=470K:
+C1:=1.5n:
+C2:=6.8n:
+R3:=1K:
+C5:=47µ:
+
+-- entrée
+R4:=47K:
+C3:=470n:
+
+
+-- Calcul des impédances f(fréquence)
+ZR1:=ZR(R1,f):
+ZR2:=ZR(R2,f):
+ZR3:=ZR(R3,f):
+ZR4:=ZR(R4,f):
+
+
+ZC1:=ZC(C1,f):
+ZC2:=ZC(C2,f):
+ZC5:=ZC(C5,f):
+ZC3:=ZC(C3,f):
+
+
+-- Calcul des impédances Z1 à Z3
+Z1:=paral(ZR1,ZC1):
+Z2:=paral(ZR2,ZC2):
+Z3:=ZR3+ZC5:
+
+
+
+-- Calcul de alpha
+alpha:=pontdiv(ZC3,ZR4):
+
+
+-- Calcul de B
+B:=pontdiv((Z2+Z1),Z3):
+
+
+-- Ampli op
+A:=amp(2e5,10,2e6,f):
+
+
+-- Calcul de H
+H:=cascad(alpha,loop(A,B)):
+
+
+
+Xlogaxis:=on:
+Ydiv:=5:
+Xdiv:=3:
+Marker=7
+
+Tracecolor:=3:
+plotline {f,dB(H)}
+
+Title="Réponse du correcteur RIAA"
+
+
+
+

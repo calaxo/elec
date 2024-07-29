@@ -1,0 +1,87 @@
+include ":incl:basic"
+include ":incl:system"
+
+-- Correcteur de tonalité Yves Caroff
+-- D. Chevallier
+-- 05/05/2001 modifié 20/10/2001
+
+
+-- Vecteur de fréquence utilisé
+f:=logspace(20,20000,300):
+
+-- Amplis op
+A1:=amp(2e5,20,4e6,f):
+
+
+-- Ampli d'entrée / sortie
+R1:=47K:
+R2:=47K:
+P:=100K:
+
+-- Valeur du potar : k=0, on est sur S, k=1, on est sur E
+k:=linspace(0,1,11):
+k:{0.000,0.100,0.200,0.300,0.400,0.500,0.600,0.700,0.800,0.900,...}
+
+-- Pont de wien
+Rw:=10K:
+C1:=22n:
+C2:=10n:
+
+-- Calcul des impédances
+ZR1:=ZR(R1,f):
+ZR2:=ZR(R2,f):
+
+ZRw:=ZR(Rw,f):
+ZC1:=ZC(C1,f):
+ZC2:=ZC(C2,f):
+
+-- Pont d'entrée
+alpha:=R2/(R1+R2):
+
+-- Contre réaction de l'ampli d'entrée
+B:=R1/(R1+R2):
+
+-- Pont de wien
+A2:=pontdiv(ZRw+ZC1,paral(ZRw,ZC2)):
+
+-- Ampli suiveur
+As:=loop(A1,cte(1,f)):
+
+-- Pont de wien + ampli suiveur
+A2:=cascad(A2,As):
+
+-- Fonction A1*A2
+A1A2:=cascad(A1,A2):
+
+
+
+-- Fonction globale
+H[i1,j1]=dB(Cdiv(k[j1]*A1A2[i1]-A1[i1]*alpha,1+A1[i1]*B-(1-k[j1])*A1A2[i1]))[1]
+dim[count(f),count(k)]
+H1:=H:
+H1:=concath(f,H1):
+
+-- Graphe
+
+-- Tracé du pont de wien
+--Ystrips:={1,2}:
+Xlogaxis:=on:
+--Xdiv:=3:
+Xmin:=20:
+Xmax:=20000:
+--Ydiv:=5:
+--Ymin:=-30:
+--Ymax:=0:
+--Tracecolor:=3:
+--Xlabel:="Pont de wien":
+--plotline{f,dB(A2)}
+
+-- Tracé de la réponse
+--newaxis
+Tracecolor:=2:
+Xdiv:=2:
+Ydiv:=2:
+Ymin:=-16:
+Ymax:=16:
+Xlabel:="Sortie du filtre":
+plotline multiplot(H1)

@@ -1,0 +1,48 @@
+include ":incl:system"
+include ":incl:basic"
+
+-- Correcteur RIAA Y. Caroff
+-- Calcul des impédances du correcteur
+-- D. Chevallier
+-- 14/03/2001
+
+-- Vecteur fréquence : étude de 20Hz à 20kHz
+f=logspace(10,10000,50)
+
+
+-- Composants du RIAA
+R1:=47K:
+R2:=470K:
+C1:=1.5n:
+C2:=6.8n:
+
+
+-- Calcul des impédances f(fréquence)
+ZR1:=ZR(R1,f):
+ZR2:=ZR(R2,f):
+
+ZC1:=ZC(C1,f):
+ZC2:=ZC(C2,f):
+
+-- Calcul des impédances Z1 et Z2
+Z1:=paral(ZR1,ZC1):
+Z2:=paral(ZR2,ZC2):
+
+
+Xlogaxis:=on:
+Ylogaxis:=on:
+
+Ydiv:=3:
+Xdiv:=3:
+
+Tracecolor:=3:
+plotline {f,Zabs(Z1)}
+
+
+Tracecolor:=4:
+plotline {f,Zabs(Z2)}
+
+Tracecolor:=2:
+plotline {f,Zabs(Z1+Z2)}
+
+

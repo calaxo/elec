@@ -1,0 +1,36 @@
+include ":incl:basic"
+include ":incl:system"
+
+-- Courbe RIAA normalisée
+-- D. Chevallier
+-- 14/03/2001
+
+-- Vecteurs fréquence
+f:=logspace(10,100000,50):
+fa:={10,50,500,2100,20000,100000}:
+
+
+-- Fonctions de transfert réelles
+a1:=cte(10,f):
+a2:=nphsft(50,500,f):
+a3:=nphsft(2100,20000,f):
+riaa:=cascad(a1,cascad(a2,a3)):
+
+-- Fonctions de transfert asymptotiques
+aa1:=20:
+aa2:=anphsft(50,500,fa):
+aa3:=anphsft(2100,20000,fa):
+
+
+Xlogaxis:=on:
+Ydiv:=2:
+Ymin:=-20:
+Ymax:=20:
+Tracecolor:=2:
+plotline {f,dB(riaa)}
+
+
+Marker:=7:
+Tracecolor:=3:
+plotline {fa,aa1+aa2+aa3}
+Title ="Courbe RIAA normalisée"

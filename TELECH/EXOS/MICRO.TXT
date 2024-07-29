@@ -1,0 +1,87 @@
+include ":incl:system"
+include ":incl:basic"
+
+-- Ampli micro Y. Caroff
+-- D. Chevallier
+-- 20/03/2001
+
+-- Vecteur fréquence : étude de 20Hz à 20kHz
+f=logspace(1,100000,50)
+
+
+-- Composants
+-- entrée
+R1:=1K:
+C2:=10µ:
+
+-- Contre réaction
+R2:=150K:
+C1:=33p:
+
+
+-- Calcul des impédances f(fréquence)
+ZR1:=ZR(R1,f):
+ZR2:=ZR(R2,f):
+
+
+ZC1:=ZC(C1,f):
+ZC2:=ZC(C2,f):
+
+
+
+
+
+-- Calcul de alpha
+alpha:=pontdiv(ZR1+ZC2,paral(ZR2,ZC1)):
+
+
+-- Calcul de B
+B:=pontdiv(paral(ZR2,ZC1),ZR1+ZC2):
+
+
+-- Ampli op 4 MHz
+A1:=amp(1e5,40,4e6,f):
+
+-- Ampli op 1 MHz
+A2:=amp(1e5,10,1e6,f):
+
+-- Ampli op parfait
+A3:=amp(1e9,1e9,1e9,f):
+
+
+-- Calcul de H1 (ampli 4MHz)
+H1:=cascad(alpha,loop(A1,B)):
+
+-- Calcul de H2 (ampli 1MHz)
+H2:=cascad(alpha,loop(A2,B)):
+
+-- Calcul de H3 (ampli parfait)
+H3:=cascad(alpha,loop(A3,B)):
+
+
+
+Xlogaxis:=on:
+Ymin:=0:
+Ymax:=55:
+Ydiv:=5:
+Xdiv:=3:
+Marker:=7:
+Tracecolor:=3:
+plotline {f,dB(H1)}
+~
+Tracecolor:=4:
+plotline {f,dB(H2)}
+
+Tracecolor:=2:
+plotline {f,dB(H3)}
+~
+Title="Réponse de l'ampli micro"
+
+
+
+
+
+
+
+
+

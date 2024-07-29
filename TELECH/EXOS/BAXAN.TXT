@@ -1,0 +1,89 @@
+include ":incl:system"
+include ":incl:basic"
+
+
+-- Calcul d'un correcteur baxandall
+-- D. Chevallier, mars 2001
+
+-- Vecteur fréquence : étude de 20Hz à 20kHz
+f=logspace(20,20000,50)
+
+
+-- Composants
+-- partie "graves"
+R1:=10K:
+R2:=10K:
+C1:=33n:
+C2:=33n:
+R3:=10K:
+-- Valeur du potentiomètre
+P1:=100K:
+x1:=0.7:
+
+-- partie "aigus"
+R4:=3.3K:
+C3:=3n:
+C4:=3n:
+P2:=100K:
+-- Valeur du potentiomètre
+x2:=0.3:
+
+
+-- Calcul des impédances f(fréquence)
+ZR1:=ZR(R1,f):
+ZR2:=ZR(R2,f):
+ZR3:=ZR(R3,f):
+ZR4:=ZR(R4,f):
+
+ZP1:=ZR(P1,f):
+ZP2:=ZR(P2,f):
+
+ZC1:=ZC(C1,f):
+ZC2:=ZC(C2,f):
+ZC3:=ZC(C3,f):
+ZC4:=ZC(C4,f):
+
+
+-- Calcul des impédances Z1 à Z4
+Z1:=ZR1+paral(x1*ZP1,ZC1):
+Z2:=ZR2+paral((1-x1)*ZP1,ZC2):
+Z3:=x2*ZP2+ZC3:
+Z4:=(1-x2)*ZP2+ZC4:
+
+
+-- Calcul des impédances des génés de thévenin
+Rth1:=ZR3+paral(Z1,Z2):
+Rth2:=ZR4+paral(Z3,Z4):
+Rth3:=Rth1:
+Rth4:=Rth2:
+
+
+
+-- Calcul de alpha
+alpha:=-(pontdiv(Z1,Z2)*pontdiv(Rth1,Rth2)+pontdiv(Z3,Z4)*pontdiv(Rth1,Rth2)):
+
+
+-- Calcul de B
+B:=(pontdiv(Z2,Z1)*pontdiv(Rth3,Rth4)+pontdiv(Z4,Z3)*pontdiv(Rth3,Rth4)):
+
+
+-- Ampli op
+A:=amp(2e5,10,2e6,f):
+
+
+-- Calcul de H
+H:=cascad(alpha,loop(A,B)):
+
+
+
+Xlogaxis:=on:
+Ydiv=1
+Ymin:=-10:
+Ymax:=10:
+Marker=7
+Tracecolor:=3:
+plotline {f,dB(H)}
+
+
+
+
